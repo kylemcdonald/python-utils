@@ -1,11 +1,22 @@
+import os
 import cv2
 import math
+import jpeg4py
 from utils.color_conversion import to_single_rgb, to_single_gray
 
-def imread(filename, mode=None):
-    img = cv2.imread(filename)
+def imread(filename, mode=None, ext=None):
+    if ext is None:
+        _, ext = os.path.splitext(filename)
+    ext = ext.lower()
+    if ext.endswith('jpg') or ext.endswith('jpeg'):
+        # jpeg4py is 2x faster than opencv
+        img = jpeg4py.JPEG(filename).decode()
+    else:
+        img = cv2.imread(filename, -1) # -1: https://stackoverflow.com/a/18461475/940196
+        if img is not None:
+            if len(img.shape) > 2:
+                img = img[...,::-1]
     if img is not None:
-        img = img[...,::-1]
         if mode is 'rgb':
             img = to_single_rgb(img)
         elif mode is 'gray':
@@ -14,7 +25,8 @@ def imread(filename, mode=None):
 
 def imwrite(filename, img):
     if img is not None:
-        img = img[...,::-1]
+        if len(img.shape) > 2:
+            img = img[...,::-1]
     return cv2.imwrite(filename, img)
 
 def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, block_size=None):
