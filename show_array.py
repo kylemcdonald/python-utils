@@ -21,6 +21,8 @@ def show_array(img, fmt='png', filename=None, retina=False, zoom=None):
             raise ValueError('input is one-dimensional', img.shape)
     img = np.uint8(np.clip(img, 0, 255))
     image_data = BytesIO()
+    if fmt is 'jpg':
+        fmt = 'jpeg'
     PIL.Image.fromarray(img).save(image_data, fmt)
     if filename is None:
         height, width = img.shape[:2]

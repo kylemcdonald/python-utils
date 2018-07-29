@@ -5,7 +5,7 @@ def to_single_rgb(img):
         return img[0,:,:,:]
     if len(img.shape) == 2: # convert gray to rgb
         img = img[:,:,np.newaxis]
-        return np.repeat(img, 3, 2)
+        return np.repeat(img, 3, 2) # might np.tile(img, [1,1,3]) be faster?
     if img.shape[-1] == 4: # drop alpha
         return img[:,:,:3]
     else:

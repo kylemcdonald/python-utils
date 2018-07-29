@@ -12,7 +12,7 @@ def imread(filename, mode=None, ext=None):
         # jpeg4py is 2x faster than opencv
         img = jpeg4py.JPEG(filename).decode()
     else:
-        img = cv2.imread(filename, -1) # -1: https://stackoverflow.com/a/18461475/940196
+        img = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
         if img is not None:
             if len(img.shape) > 2:
                 img = img[...,::-1]
@@ -74,3 +74,5 @@ def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None):
         return upsample(img, scale, output_wh, max_side, min_side)
     else:
         return downsample(img, scale, output_wh, max_side, min_side)
+
+# to add: imcrop (crops from center)
