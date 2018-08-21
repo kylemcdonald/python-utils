@@ -6,6 +6,7 @@ import numpy as np
 import PIL.Image
 import IPython.display
 import shutil
+from utils.color_conversion import to_single_rgb
 from math import sqrt
 
 def show_array(img, fmt='png', filename=None, retina=False, zoom=None):
@@ -19,10 +20,14 @@ def show_array(img, fmt='png', filename=None, retina=False, zoom=None):
             img = img.reshape(side, side)
         else:
             raise ValueError('input is one-dimensional', img.shape)
+    if len(img.shape) == 3 and img.shape[-1] == 1:
+        img = img.squeeze()
     img = np.uint8(np.clip(img, 0, 255))
-    image_data = BytesIO()
-    if fmt is 'jpg':
+    if fmt == 'jpg':
         fmt = 'jpeg'
+    if fmt == 'jpeg':
+        img = to_single_rgb(img)
+    image_data = BytesIO()
     PIL.Image.fromarray(img).save(image_data, fmt)
     if filename is None:
         height, width = img.shape[:2]

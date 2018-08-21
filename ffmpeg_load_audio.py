@@ -1,13 +1,7 @@
-# can we adda aframes to avoid reading more than necessary?
-# what is the correct bufsize? do we need bufsize at all?
-# what is the best chunk_size for reading data?
-# could we ask ffmpeg to do type conversion for us?
-# reference:
-# http://git.numm.org/?p=numm.git;a=blob_plain;f=numm3/media.py;hb=refs/heads/numm3
-
 import numpy as np
 import subprocess as sp
 import os
+import time
 DEVNULL = open(os.devnull, 'w')
 
 # attempts to handle all float/integer conversions with and without normalizing
@@ -63,19 +57,10 @@ def ffmpeg_load_audio(filename, sr=44100, mono=False, normalize=True, in_type=np
         '-ar', str(sr),
         '-ac', str(channels),
         '-']
-    p = sp.Popen(command, stdout=sp.PIPE, stderr=DEVNULL, bufsize=4096, close_fds=True)
-    bytes_per_sample = np.dtype(in_type).itemsize
-    frame_size = bytes_per_sample * channels
-    chunk_size = frame_size * sr # read in 1-second chunks
-    raw = b''
-    with p.stdout as stdout:
-        while True:
-            data = stdout.read(chunk_size)
-            if data:
-                raw += data
-            else:
-                break
-    audio = np.fromstring(raw, dtype=in_type)
+    p = sp.Popen(command, stdout=sp.PIPE, stderr=DEVNULL)
+    raw, err = p.communicate()
+    audio = np.frombuffer(raw, dtype=in_type)
+    
     if channels > 1:
         audio = audio.reshape((-1, channels)).transpose()
 

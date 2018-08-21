@@ -19,3 +19,11 @@ def to_single_gray(img):
         return img.mean(axis=2)
     else:
         return img
+
+def rb_swap(img):
+    if len(img.shape) < 3:
+        return img
+    if img.shape[2] == 3:
+        return img[...,(2,1,0)]
+    if img.shape[2] == 4:
+        return img[...,(2,1,0,3)]

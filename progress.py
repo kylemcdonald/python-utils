@@ -2,6 +2,7 @@ from multiprocessing import Pool, cpu_count
 from IPython.display import clear_output
 import time
 from datetime import datetime, timedelta
+import sys
 
 def progress(itr, total=None, update_interval=1):
     if total is None and hasattr(itr, '__len__'):
@@ -33,8 +34,7 @@ def progress(itr, total=None, update_interval=1):
                 print('{} {} {:.2f}/s'.format(i+1, duration_str, speed))
             last_time = cur_time
     
-    # this code is repeated from above
-    duration = cur_time - start_time
+    duration = time.time() - start_time
     speed = (i + 1) / duration
     duration_str = timedelta(seconds=round(duration))
     clear_output(wait=True)

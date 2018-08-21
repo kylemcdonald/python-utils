@@ -2,7 +2,7 @@ import os
 import cv2
 import math
 import jpeg4py
-from utils.color_conversion import to_single_rgb, to_single_gray
+from utils.color_conversion import to_single_rgb, to_single_gray, rb_swap
 
 def imread(filename, mode=None, ext=None):
     if ext is None:
@@ -15,7 +15,7 @@ def imread(filename, mode=None, ext=None):
         img = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
         if img is not None:
             if len(img.shape) > 2:
-                img = img[...,::-1]
+                img = rb_swap(img)
     if img is not None:
         if mode is 'rgb':
             img = to_single_rgb(img)
