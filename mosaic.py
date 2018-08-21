@@ -5,8 +5,8 @@ def find_rectangle(n):
     max_side = int(math.sqrt(n))
     for h in range(2, max_side+1)[::-1]:
         w = n // h
-        if (w * h) == n:
-            return (w,h)
+        if (h * w) == n:
+            return (h, w)
     return (n, 1)
 
 # 1d images (n, h*w): no
