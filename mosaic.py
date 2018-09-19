@@ -9,6 +9,12 @@ def find_rectangle(n):
             return (h, w)
     return (n, 1)
 
+def swapaxes(x,a,b):
+    try:
+        return x.swapaxes(a,b)
+    except AttributeError: # support pytorch
+        return x.transpose(a,b)
+
 # 1d images (n, h*w): no
 # 2d images (n, h, w): yes
 # 3d images (n, h, w, c): yes
@@ -27,7 +33,7 @@ def make_mosaic(x, nx=None, ny=None):
         
     end_shape = (w,c) if has_channels else (w,)
     mosaic = x.reshape(ny, nx, h, *end_shape)
-    mosaic = mosaic.swapaxes(1,2)
+    mosaic = swapaxes(mosaic, 1, 2)
     hh = mosaic.shape[0] * mosaic.shape[1]
     ww = mosaic.shape[2] * mosaic.shape[3]
     end_shape = (ww,c) if has_channels else (ww,)
@@ -65,6 +71,6 @@ def unmake_mosaic(mosaic, nx=None, ny=None, w=None, h=None):
     end_shape = (w, mosaic.shape[2]) if len(mosaic.shape) > 2 else (w,)
 
     x = mosaic.reshape(ny, h, nx, *end_shape)
-    x = x.swapaxes(1,2)
+    x = swapaxes(x, 1, 2)
     x = x.reshape(-1, h, *end_shape)
     return x
