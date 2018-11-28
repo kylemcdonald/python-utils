@@ -8,10 +8,16 @@ def imread(filename, mode=None, ext=None):
     if ext is None:
         _, ext = os.path.splitext(filename)
     ext = ext.lower()
+    use_jpeg4py = False
     if ext.endswith('jpg') or ext.endswith('jpeg'):
-        # jpeg4py is 2x faster than opencv
-        img = jpeg4py.JPEG(filename).decode()
-    else:
+        use_jpeg4py = True
+        try:
+            # jpeg4py is 2x faster than opencv
+            img = jpeg4py.JPEG(filename).decode()
+        except:
+            # sometimes jpeg4py fails to read a valid jpeg
+            use_jpeg4py = False
+    if not use_jpeg4py:
         img = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
         if img is not None:
             if len(img.shape) > 2:
