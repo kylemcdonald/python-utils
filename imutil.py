@@ -1,27 +1,17 @@
 import os
 import cv2
 import math
-import jpeg4py
 from utils.color_conversion import to_single_rgb, to_single_gray, rb_swap
 
+# jpeg4py is 2x as fast as opencv for jpegs, but more unstable
 def imread(filename, mode=None, ext=None):
     if ext is None:
         _, ext = os.path.splitext(filename)
     ext = ext.lower()
-    use_jpeg4py = False
-    if ext.endswith('jpg') or ext.endswith('jpeg'):
-        use_jpeg4py = True
-        try:
-            # jpeg4py is 2x faster than opencv
-            img = jpeg4py.JPEG(filename).decode()
-        except:
-            # sometimes jpeg4py fails to read a valid jpeg
-            use_jpeg4py = False
-    if not use_jpeg4py:
-        img = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
-        if img is not None:
-            if len(img.shape) > 2:
-                img = rb_swap(img)
+    img = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
+    if img is not None:
+        if len(img.shape) > 2:
+            img = rb_swap(img)
     if img is not None:
         if mode is 'rgb':
             img = to_single_rgb(img)
