@@ -15,11 +15,12 @@ def build_rainbow(n, curve=None):
 
 def to_rainbow(x, n=1024, minimum=None, maximum=None):
     rainbow_lookup = build_rainbow(n)
+    indices = np.copy(x).astype('float')
     if minimum is None:
         minimum = x.min()
     if maximum is None:
         maximum = x.max()
-    x -= minimum
-    x *= n / (maximum - minimum)
-    indices = np.minimum(x, n - 1).astype(int)
+    indices -= minimum
+    indices *= n / (maximum - minimum)
+    indices = np.minimum(indices, n - 1).astype(np.int)
     return rainbow_lookup.take(indices, axis=0)
