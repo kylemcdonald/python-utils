@@ -11,7 +11,7 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
         canvas[rr,cc] = stroke
 
 def draw_rectangle(canvas, rect, fill=None, stroke=None):
-    n,e,s,w = rect
+    w,n,e,s = rect
     x,y = (n,n,s,s), (w,e,e,w)
     if fill:
         rr,cc = polygon(x, y, shape=canvas.shape)
@@ -21,5 +21,5 @@ def draw_rectangle(canvas, rect, fill=None, stroke=None):
         canvas[rr,cc] = stroke
         
 def draw_rectangle_dlib(canvas, det, fill=None, stroke=None):
-    rect = (det.top(), det.right(), det.bottom(), det.left())
+    rect = (det.left(), det.top(), det.right(), det.bottom())
     draw_rectangle(canvas, rect, fill=fill, stroke=stroke)
