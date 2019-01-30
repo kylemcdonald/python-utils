@@ -10,7 +10,7 @@ def build_rainbow(n, curve=None):
     rainbow = (1 + np.vstack(rgb)) / 2
     if curve:
         rainbow = curve(rainbow)
-    rainbow = np.minimum(rainbow * 256, 255).astype(int)
+    rainbow = np.minimum(rainbow * 256, 255).astype(np.uint8)
     return rainbow.T
 
 def to_rainbow(x, n=1024, minimum=None, maximum=None):
