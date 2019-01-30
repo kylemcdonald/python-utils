@@ -80,7 +80,6 @@ def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, bl
         img = cv2.blur(img, (block_size, block_size))
     return cv2.resize(img, output_wh, cv2.INTER_AREA)
 
-
 def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None):
     if max_side is not None:
         cur_max_side = max(img.shape[:2])
@@ -89,7 +88,8 @@ def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None):
         cur_min_side = min(img.shape[:2])
         scale = min_side / cur_min_side
     if output_wh is None:
-        output_wh = (int(img.shape[1]*scale), int(img.shape[0]*scale))
+        output_wh = (int(np.round(img.shape[1]*scale)),
+                     int(np.round(img.shape[0]*scale)))
     return cv2.resize(img, output_wh, cv2.INTER_CUBIC)
 
 def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None):
@@ -109,5 +109,3 @@ def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None):
         return upsample(img, scale, output_wh, max_side, min_side)
     else:
         return downsample(img, scale, output_wh, max_side, min_side)
-
-# to add: imcrop (crops from center)
