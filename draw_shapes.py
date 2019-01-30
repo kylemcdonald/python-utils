@@ -10,8 +10,8 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
         rr,cc = circle_perimeter(x, y, r, shape=canvas.shape)
         canvas[rr,cc] = stroke
 
-def draw_rectangle(canvas, det, fill=None, stroke=None):
-    n,e,s,w = (det.top(), det.right(), det.bottom(), det.left())
+def draw_rectangle(canvas, rect, fill=None, stroke=None):
+    n,e,s,w = rect
     x,y = (n,n,s,s), (w,e,e,w)
     if fill:
         rr,cc = polygon(x, y, shape=canvas.shape)
@@ -19,3 +19,7 @@ def draw_rectangle(canvas, det, fill=None, stroke=None):
     if stroke:
         rr,cc = polygon_perimeter(x, y, shape=canvas.shape)
         canvas[rr,cc] = stroke
+        
+def draw_rectangle_dlib(canvas, det, fill=None, stroke=None):
+    rect = (det.top(), det.right(), det.bottom(), det.left())
+    draw_rectangle(canvas, rect, fill=fill, stroke=stroke)
