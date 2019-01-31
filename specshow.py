@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from utils.show_array import show_array
+from utils.imutil import imshow
 
 def specshow(x, spacing=256, sr=44100, max_frames=1960, skip=1, gamma=6, use_mag=True, cmap='inferno'):
     frames, bins = x.shape
@@ -18,5 +18,5 @@ def specshow(x, spacing=256, sr=44100, max_frames=1960, skip=1, gamma=6, use_mag
     spec **= 1 / gamma
     cm = plt.get_cmap(cmap)
     spec = cm(spec)[:,:,:3]
-    show_array(255 * np.flipud(spec), retina=True)
+    imshow(255 * np.flipud(spec), retina=True)
     print(f'{minutes}:{seconds:04.2f} @ {sr}Hz, {frames} frames x {bins} bins @ {spacing} spacing')
