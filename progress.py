@@ -48,6 +48,9 @@ class job_wrapper(object):
         return i, self.job(task)
     
 def progress_parallel(job, tasks, total=None, update_interval=1, processes=None):
+    if processes == 1:
+        return [job(task) for task in progress(tasks)]
+    
     results = []
     if total is None and hasattr(tasks, '__len__'):
         total = len(tasks)

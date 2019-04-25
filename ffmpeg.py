@@ -37,7 +37,15 @@ def convert_bit_depth(y, in_type, out_type, normalize=False):
     return y
 
 # load_audio can not detect the input type
-def ffmpeg_load_audio(filename, sr=44100, mono=False, normalize=True, in_type=np.int16, out_type=np.float32):
+# could use a command like this with sr=None or detect=True:
+# ffprobe -hide_banner \
+#     -loglevel fatal \
+#     -show_error \
+#     -show_format \
+#     -show_streams \
+#     -print_format json \
+#     -i fn
+def auread(filename, sr=44100, mono=False, normalize=True, in_type=np.int16, out_type=np.float32):
     in_type = np.dtype(in_type).type
     out_type = np.dtype(out_type).type
     channels = 1 if mono else 2
@@ -70,3 +78,23 @@ def ffmpeg_load_audio(filename, sr=44100, mono=False, normalize=True, in_type=np
     audio = convert_bit_depth(audio, in_type, out_type, normalize)
 
     return audio, sr
+
+def auwrite(fn, audio, sr, channels=1):
+    format_strings = {
+        'float64': 'f64le',
+        'float32': 'f32le',
+        'int16': 's16le',
+        'int32': 's32le',
+        'uint32': 'u32le'
+    }
+    format_strings = {np.dtype(key): value for key,value in format_strings.items()}
+    format_string = format_strings[audio.dtype]
+    command = [
+        'ffmpeg',
+        '-y',
+        '-ar', str(sr),
+        '-f', format_string,
+        '-i', 'pipe:',
+        fn]
+    p = sp.Popen(command, stdin=sp.PIPE, stdout=None, stderr=None)
+    raw, err = p.communicate(audio.tobytes())

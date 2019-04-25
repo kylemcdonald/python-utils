@@ -11,6 +11,7 @@ try: # Python 2
 except: # Python 3
     from io import BytesIO
     
+# should add code to automatically scale 0-1 to 0-255
 def imshow(img, fmt='png', retina=False, zoom=None):
     if img is None:
         raise TypeError('input image not provided')
@@ -62,7 +63,7 @@ def imwrite(filename, img):
             img = img[...,::-1]
     return cv2.imwrite(filename, img)
 
-def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, block_size=None):
+def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, block_size=None, mode=None):
     if max_side is not None:
         cur_max_side = max(img.shape[:2])
         scale = max_side / cur_max_side
@@ -78,10 +79,10 @@ def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, bl
         block_size = img.shape[1]//output_wh[0]
     if block_size > 1:
         img = cv2.blur(img, (block_size, block_size))
-    return cv2.resize(img, output_wh, cv2.INTER_AREA)
+    return cv2.resize(img, output_wh, interpolation=cv2.INTER_AREA if mode is None else mode)
 
 
-def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None):
+def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None, mode=None):
     if max_side is not None:
         cur_max_side = max(img.shape[:2])
         scale = max_side / cur_max_side
@@ -90,9 +91,9 @@ def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None):
         scale = min_side / cur_min_side
     if output_wh is None:
         output_wh = (int(img.shape[1]*scale), int(img.shape[0]*scale))
-    return cv2.resize(img, output_wh, cv2.INTER_CUBIC)
+    return cv2.resize(img, output_wh, interpolation=cv2.INTER_CUBIC if mode is None else mode)
 
-def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None):
+def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None, mode=None):
     big = True
     if max_side is not None:
         cur_max_side = max(img.shape[:2])
@@ -106,8 +107,8 @@ def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None):
         big = scale > 1
     
     if big:
-        return upsample(img, scale, output_wh, max_side, min_side)
+        return upsample(img, scale, output_wh, max_side, min_side, mode)
     else:
-        return downsample(img, scale, output_wh, max_side, min_side)
+        return downsample(img, scale, output_wh, max_side, min_side, mode)
 
 # to add: imcrop (crops from center)
