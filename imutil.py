@@ -81,7 +81,6 @@ def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, bl
         img = cv2.blur(img, (block_size, block_size))
     return cv2.resize(img, output_wh, interpolation=cv2.INTER_AREA if mode is None else mode)
 
-
 def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None, mode=None):
     if max_side is not None:
         cur_max_side = max(img.shape[:2])
@@ -110,5 +109,3 @@ def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None, mode
         return upsample(img, scale, output_wh, max_side, min_side, mode)
     else:
         return downsample(img, scale, output_wh, max_side, min_side, mode)
-
-# to add: imcrop (crops from center)

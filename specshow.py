@@ -21,3 +21,4 @@ def specshow(x, spacing=256, sr=44100, max_frames=1960, skip=1, gamma=6, use_mag
     spec = cm(spec)[:,:,:3]
     imshow(255 * np.flipud(spec), retina=zoom is None, zoom=zoom)
     print(f'{minutes}:{seconds:04.2f} @ {sr}Hz, {frames} frames x {bins} bins @ {spacing} spacing')
+    
