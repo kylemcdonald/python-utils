@@ -1,6 +1,7 @@
 import numpy as np
 
-def safe_crop(arr, n, s, w, e, fill=128):
+def safe_crop(arr, tblr, fill=128):
+    n,s,w,e = tblr
     shape = np.asarray(arr.shape)
     shape[:2] = s - n, e - w
     no, so, wo, eo = 0, shape[0], 0, shape[1]

@@ -12,21 +12,33 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
 
 def draw_rectangle(canvas, rect, fill=None, stroke=None):
     t,b,l,r = rect
-    t = max(t,0)
-    b = min(b,canvas.shape[0]-1)
-    l = max(l,0)
-    r = min(r,canvas.shape[1]-1)
+    t = int(max(t,0))
+    b = int(min(b,canvas.shape[0]-1))
+    l = int(max(l,0))
+    r = int(min(r,canvas.shape[1]-1))
     if fill is not None:
         canvas[t:b,l:r] = fill
     if stroke is not None:
         b -= 1
         r -= 1
-        canvas[t:b,l] = stroke
-        canvas[t:b,r] = stroke
-        canvas[t,l:r] = stroke
-        canvas[b,l:r+1] = stroke
+        try:
+            canvas[t:b,l] = stroke
+        except IndexError:
+            pass
+        try:
+            canvas[t:b,r] = stroke
+        except IndexError:
+            pass
+        try:
+            canvas[t,l:r] = stroke
+        except IndexError:
+            pass
+        try:
+            canvas[b,l:r+1] = stroke
+        except IndexError:
+            pass
         
 def draw_rectangle_dlib(canvas, det, fill=None, stroke=None):
-    rect = (det.left(), det.top(), det.right(), det.bottom())
+    rect = (det.top(), det.bottom(), det.left(), det.right())
     draw_rectangle(canvas, rect, fill=fill, stroke=stroke)
     
