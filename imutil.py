@@ -2,7 +2,6 @@ import os
 import cv2
 import numpy as np
 import PIL.Image
-import IPython.display
 import shutil
 from utils.color_conversion import to_single_rgb, to_single_gray, rb_swap
 
@@ -13,6 +12,7 @@ except: # Python 3
     
 # should add code to automatically scale 0-1 to 0-255
 def imshow(img, fmt='png', retina=False, zoom=None):
+    import IPython.display
     if img is None:
         raise TypeError('input image not provided')
     
