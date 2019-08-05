@@ -7,6 +7,8 @@ import sys
 def progress(itr, total=None, update_interval=1):
     if total is None and hasattr(itr, '__len__'):
         total = len(itr)
+        if total == 0:
+            return
     if total:
         print('0/{} 0s 0/s'.format(total))
     else:
