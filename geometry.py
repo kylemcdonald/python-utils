@@ -38,6 +38,8 @@ def line_point_closest(p1, p2, p3):
 # from 0/0 to width/height
 # to -1,+1 to +1/-1 (y axis is flipped)
 def screen_to_world(screen, depth, viewport, extrinsics, camera_matrix):
+    principal_point = camera_matrix[:2,2]
+    screen -= principal_point - (viewport - 1) / 2
     camera = [
         2 * screen[0] / viewport[0] - 1,
         1 - 2 * screen[1] / viewport[1],
@@ -68,11 +70,10 @@ def perspective(fovy, aspect, z_near, z_far):
     result[0,0] = 1 / (aspect * tan_half_fovy)
     result[1,1] = 1 / tan_half_fovy
     result[2,3] = -1
-    result[2][2] = -(z_far + z_near) / (z_far - z_near)
-    result[3][2] = -(2 * z_far * z_near) / (z_far - z_near)
+    result[2,2] = -(z_far + z_near) / (z_far - z_near)
+    result[3,2] = -(2 * z_far * z_near) / (z_far - z_near)
     return result
 
-# assumes fixed principal point
 def get_projection_matrix(viewport, camera_matrix, z_near=1, z_far=1000):
     aspect = viewport[0] / viewport[1]
     fovy = 2 * math.atan(viewport[1] / (2 * camera_matrix[1,1]))
