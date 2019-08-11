@@ -19,6 +19,9 @@ def swapaxes(x,a,b):
 # 2d images (n, h, w): yes
 # 3d images (n, h, w, c): yes
 def make_mosaic(x, nx=None, ny=None):
+    if not isinstance(x, np.ndarray):
+        x = np.asarray(x)
+    
     n, h, w = x.shape[:3]
     has_channels = len(x.shape) > 3
     if has_channels:

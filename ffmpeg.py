@@ -98,3 +98,25 @@ def auwrite(fn, audio, sr, channels=1):
         fn]
     p = sp.Popen(command, stdin=sp.PIPE, stdout=None, stderr=None)
     raw, err = p.communicate(audio.tobytes())
+    
+import ffmpeg
+
+def vidwrite(fn, images):
+    if not isinstance(images, np.ndarray):
+        images = np.asarray(images)
+    n,height,width,channels = images.shape
+    process = (
+        ffmpeg
+            .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+            .output(fn, pix_fmt='yuv420p', vcodec='libx264', r=60)
+            .overwrite_output()
+            .run_async(pipe_stdin=True)
+    )
+    for frame in images:
+        process.stdin.write(
+            frame
+                .astype(np.uint8)
+                .tobytes()
+        )
+    process.stdin.close()
+    process.wait()
