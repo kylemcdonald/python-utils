@@ -29,7 +29,19 @@ def line_line_closest(p1,p2,p3,p4):
 
 # point on line p1,p2 closest to point p3 
 def line_point_closest(p1, p2, p3):
+    p1 = np.asarray(p1)
+    p2 = np.asarray(p2)
+    p3 = np.asarray(p3)
     u = ((p3 - p1)*(p2 - p1)).sum() / np.square(np.linalg.norm(p2 - p1))
+    return p1 + u * (p2 - p1)
+
+# point on ray p1->p2 closest to point p3 
+def ray_point_closest(p1, p2, p3):
+    p1 = np.asarray(p1)
+    p2 = np.asarray(p2)
+    p3 = np.asarray(p3)
+    u = ((p3 - p1)*(p2 - p1)).sum() / np.square(np.linalg.norm(p2 - p1))
+    u = max(u, 0)
     return p1 + u * (p2 - p1)
 
 # numpy multiplication order is "reversed" from openFrameworks,
