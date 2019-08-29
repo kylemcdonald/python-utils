@@ -91,12 +91,12 @@ def get_projection_matrix(viewport, camera_matrix, z_near=1, z_far=1000):
     fovy = 2 * math.atan(viewport[1] / (2 * camera_matrix[1,1]))
     return perspective(fovy, aspect, z_near, z_far)
     
-def vec_extrensics(rvec,tvec):
-    R,jacobian = cv2.Rodrigues(np.mat(rvec))
-    totalrotmax=np.array([[R[0,0],R[0,1],R[0,2],tvec[0]],
-                        [R[1,0],R[1,1],R[1,2],tvec[1]],
-                        [R[2,0],R[2,1],R[2,2],tvec[2]],
-                        [0,0,0,1]])
-    WtoC=np.mat(totalrotmax)
-    extrensics = np.transpose(np.linalg.inv(WtoC))
-    return extrensics
+def vec_to_extrinsics(rvec,tvec):
+    R, jacobian = cv2.Rodrigues(np.mat(rvec))
+    arr = np.array([[R[0,0],R[0,1],R[0,2],tvec[0]],
+                    [R[1,0],R[1,1],R[1,2],tvec[1]],
+                    [R[2,0],R[2,1],R[2,2],tvec[2]],
+                    [0,0,0,1]])
+    mat = np.mat(arr)
+    extrinsics = np.transpose(np.linalg.inv(mat))
+    return extrinsics
