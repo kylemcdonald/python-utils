@@ -30,9 +30,10 @@ class Ticker():
         self.total_ticks += 1
 
 class Profiler():
-    def __init__(self):
+    def __init__(self, name):
         self.timing = {}
         self.last_print = None
+        self.name = name
         
     @contextlib.contextmanager
     def profile(self, name):
@@ -53,7 +54,7 @@ class Profiler():
                 elapsed, count = self.timing[name]
                 average = format_time(elapsed / count)
                 parts.append(f'{name}: {average}')
-            print(', '.join(parts))
+            print(self.name + ': ' + ', '.join(parts))
             self.last_print = cur
             self.timing = {}
 

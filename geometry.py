@@ -1,6 +1,17 @@
 import numpy as np
 import math
 
+# angle between two vectors
+def vector_vector_angle(v1, v2):
+    a1 = np.arctan2(v1[1], v1[0])
+    a2 = np.arctan2(v2[1], v2[0])
+    sign = 1 if a1 > a2 else -1
+    angle = a1 - a2
+    K = -sign * np.pi * 2
+    if np.abs(K + angle) < np.abs(angle):
+        angle += K
+    return angle
+
 # pair of points on lines p1,p2 and p3,p4 closest to each other
 def line_line_closest(p1,p2,p3,p4):
     p13 = p1 - p3
