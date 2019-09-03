@@ -22,6 +22,7 @@ def safe_crop(arr, tblr, fill=128):
     try:
         out[no:so,wo:eo] = arr[n:s,w:e]
     except ValueError:
+        # this happens when there is no overlap
         pass
     return out
 

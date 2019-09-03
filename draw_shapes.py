@@ -43,8 +43,8 @@ def draw_rectangle(canvas, rect, fill=None, stroke=None):
             canvas[b,l:r+1] = stroke
         except IndexError:
             pass
-        
+
 def draw_rectangle_dlib(canvas, det, fill=None, stroke=None):
     rect = (det.top(), det.bottom(), det.left(), det.right())
     draw_rectangle(canvas, rect, fill=fill, stroke=stroke)
-    
+
