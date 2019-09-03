@@ -19,7 +19,11 @@ def safe_crop(arr, tblr, fill=128):
         e = arr.shape[1]
     out = np.empty(shape, dtype=arr.dtype)
     out.fill(fill)
-    out[no:so,wo:eo] = arr[n:s,w:e]
+    try:
+        out[no:so,wo:eo] = arr[n:s,w:e]
+    except ValueError:
+        # this happens when there is no overlap
+        pass
     return out
 
 def inner_square_crop(img):

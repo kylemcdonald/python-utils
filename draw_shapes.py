@@ -3,6 +3,8 @@ from skimage.draw import polygon, polygon_perimeter
 import cv2
 
 def draw_line(canvas, pt1, pt2, r=1, stroke=None):
+    pt1 = tuple(np.asarray(pt1).astype(int).tolist())
+    pt2 = tuple(np.asarray(pt2).astype(int).tolist())
     cv2.line(canvas, pt1, pt2, stroke, thickness=r, lineType=cv2.LINE_AA)
 
 def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
