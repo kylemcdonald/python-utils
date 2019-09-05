@@ -57,6 +57,8 @@ class Profiler():
             print(self.name + ': ' + ', '.join(parts))
             self.last_print = cur
             self.timing = {}
+            return True
+        return False
 
 def format_time(seconds):
     if seconds < 1/1e5:
