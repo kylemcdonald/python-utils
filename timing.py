@@ -3,6 +3,11 @@ from time import sleep
 import contextlib
 import numpy as np
 from IPython.display import clear_output
+import json
+from multiprocessing import Queue
+from multiprocessing import Process
+from threading import get_ident
+import os
 
 class Ticker():
     def __init__(self):
@@ -71,3 +76,52 @@ def format_time(seconds):
         return f'{seconds*1e3:0.0f}ms'
     else:
         return f'{seconds:0.1f}s'
+
+class Tracer():
+    def __init__(self, fn):
+        self.queue = Queue()
+        self.pid_names = {}
+        self.tid_names = {}
+
+        def tracer_loop():
+            output = open(fn, 'w')
+            output.write('[\n')
+            while True:
+                entry = self.queue.get()
+                line = json.dumps(entry, separators=(',', ':'))
+                output.write(line + ',\n')
+
+        self.set_pid_name('Main')
+        self.tracer = Process(target=tracer_loop)
+        self.tracer.start()
+
+    def set_tid_name(self, name):
+        self.tid_names[get_ident()] = name
+
+    def set_pid_name(self, name):
+        self.pid_names[os.getpid()] = name
+
+    @contextlib.contextmanager
+    def trace(self, name, pid=None, tid=None):
+        ts = time()
+        yield
+        dur = time() - ts
+        ts *= 1000000 # seconds to microseconds
+        dur *= 1000000 # seconds to microseconds
+        if pid is None:
+            pid = os.getpid()
+        if pid in self.pid_names:
+            pid = self.pid_names[pid]
+        if tid is None:
+            tid = get_ident()
+        if tid in self.tid_names:
+            tid = self.tid_names[tid]
+        entry = {
+            'name': name,
+            'ph': 'X',
+            'ts': ts,
+            'dur': dur,
+            'pid': pid,
+            'tid': tid
+        }
+        self.queue.put(entry)
