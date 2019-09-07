@@ -83,6 +83,11 @@ class Tracer():
         self.pid_names = {}
         self.tid_names = {}
 
+        self.enabled = True
+        if fn is None:
+            self.enabled = False
+            return
+
         def tracer_loop():
             output = open(fn, 'w')
             output.write('[\n')
@@ -106,6 +111,8 @@ class Tracer():
         ts = time()
         yield
         dur = time() - ts
+        if not self.enabled:
+            return
         ts *= 1000000 # seconds to microseconds
         dur *= 1000000 # seconds to microseconds
         if pid is None:
