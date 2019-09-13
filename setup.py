@@ -6,6 +6,6 @@ setup(name="pyutils",
       version="0.1",
       description="Test for pip install git+",
       url="https://github.com/kylemcdonald/python-utils",
-      install_requires=["numpy", "python-opencv", "Pillow", "shutil"],
+      install_requires=["numpy", "python-opencv", "Pillow"],
       packages=find_packages()
 )
