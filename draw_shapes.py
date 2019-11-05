@@ -1,5 +1,3 @@
-from skimage.draw import circle, circle_perimeter
-from skimage.draw import polygon, polygon_perimeter
 import cv2
 
 def draw_line(canvas, pt1, pt2, r=1, stroke=None):
@@ -7,7 +5,17 @@ def draw_line(canvas, pt1, pt2, r=1, stroke=None):
     pt2 = tuple(map(int, pt2))
     cv2.line(canvas, pt1, pt2, stroke, thickness=r, lineType=cv2.LINE_AA)
 
+def draw_text(canvas, text, xy, color=0, scale=1, thickness=1, highlight=None,
+        font_face=cv2.FONT_HERSHEY_SIMPLEX, antialias=False):
+    l,t = xy
+    (tw,th), baseline = cv2.getTextSize(text, font_face, scale, thickness)
+    t += th + baseline - 1
+    if highlight is not None:
+        canvas[t-th-baseline-1:t,l:l+tw] = highlight
+    cv2.putText(canvas, text, (l,t-baseline), font_face, scale, color, thickness, cv2.LINE_AA if antialias else 0)
+
 def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
+    from skimage.draw import circle, circle_perimeter
     x,y = tuple(map(int, xy))
     if fill:
         rr,cc = circle(y, x, r, shape=canvas.shape)
@@ -16,8 +24,8 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
         rr,cc = circle_perimeter(y, x, r, shape=canvas.shape)
         canvas[rr,cc] = stroke
 
-def draw_rectangle(canvas, rect, fill=None, stroke=None):
-    t,b,l,r = rect
+def draw_rectangle(canvas, tblr, fill=None, stroke=None):
+    t,b,l,r = tblr
     t = int(max(t,0))
     b = int(min(b,canvas.shape[0]-1))
     l = int(max(l,0))

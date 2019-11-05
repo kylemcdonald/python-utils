@@ -60,6 +60,7 @@ def ray_point_closest(p1, p2, p3):
 
 # from 0/0 to width/height
 # to -1,+1 to +1/-1 (y axis is flipped)
+# note that depth is not in world units, but normalized by z_near/z_far
 def screen_to_world(screen, depth, viewport, extrinsics, camera_matrix):
     principal_point = camera_matrix[:2,2]
     screen -= principal_point - (viewport - 1) / 2
