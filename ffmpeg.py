@@ -101,14 +101,14 @@ def auwrite(fn, audio, sr, channels=1):
     
 import ffmpeg
 
-def vidwrite(fn, images):
+def vidwrite(fn, images, vcodec='libx264', fps=30):
     if not isinstance(images, np.ndarray):
         images = np.asarray(images)
     n,height,width,channels = images.shape
     process = (
         ffmpeg
-            .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
-            .output(fn, pix_fmt='yuv420p', vcodec='libx264', r=60)
+            .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height), framerate=fps)
+            .output(fn, pix_fmt='yuv420p', vcodec=vcodec)
             .overwrite_output()
             .run_async(pipe_stdin=True)
     )

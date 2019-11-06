@@ -24,6 +24,19 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
         rr,cc = circle_perimeter(y, x, r, shape=canvas.shape)
         canvas[rr,cc] = stroke
 
+# @njit
+# def draw_circle(canvas, xy, r, fill):
+#     x,y = xy
+#     r2 = r * r
+#     for i in range(canvas.shape[0]):
+#         cy = i - y
+#         cy2 = cy * cy
+#         for j in range(canvas.shape[1]):
+#             cx = j - x
+#             ls = cx * cx + cy2
+#             if ls < r2:
+#                 canvas[i,j] = fill     
+
 def draw_rectangle(canvas, tblr, fill=None, stroke=None):
     t,b,l,r = tblr
     t = int(max(t,0))
