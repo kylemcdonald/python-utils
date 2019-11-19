@@ -14,15 +14,13 @@ def draw_text(canvas, text, xy, color=0, scale=1, thickness=1, highlight=None,
         canvas[t-th-baseline-1:t,l:l+tw] = highlight
     cv2.putText(canvas, text, (l,t-baseline), font_face, scale, color, thickness, cv2.LINE_AA if antialias else 0)
 
-def draw_circle(canvas, xy, r=1, stroke=None, fill=None):
-    from skimage.draw import circle, circle_perimeter
+def draw_circle(canvas, xy, r=1, stroke=None, fill=None, thickness=1, antialias=False):
     x,y = tuple(map(int, xy))
-    if fill:
-        rr,cc = circle(y, x, r, shape=canvas.shape)
-        canvas[rr,cc] = fill
-    if stroke:
-        rr,cc = circle_perimeter(y, x, r, shape=canvas.shape)
-        canvas[rr,cc] = stroke
+    line_type = cv2.LINE_AA if antialias else cv2.LINE_8
+    if fill is not None:
+        cv2.circle(canvas, (x,y), r, fill, -1, line_type)
+    if stroke is not None:
+        cv2.circle(canvas, (x,y), r, stroke, thickness, line_type)
 
 # @njit
 # def draw_circle(canvas, xy, r, fill):
