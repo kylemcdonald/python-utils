@@ -101,22 +101,39 @@ def auwrite(fn, audio, sr, channels=1):
     
 import ffmpeg
 
-def vidwrite(fn, images, vcodec='libx264', fps=30):
-    if not isinstance(images, np.ndarray):
-        images = np.asarray(images)
-    n,height,width,channels = images.shape
-    process = (
-        ffmpeg
-            .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height), framerate=fps)
-            .output(fn, pix_fmt='yuv420p', vcodec=vcodec)
-            .overwrite_output()
-            .run_async(pipe_stdin=True)
-    )
-    for frame in images:
-        process.stdin.write(
+class VideoWriter:
+    def __init__(self, fn, vcodec='libx264', fps=60, in_pix_fmt='rgb24', out_pix_fmt='yuv420p'):
+        self.fn = fn
+        self.vcodec = vcodec
+        self.fps = fps
+        self.process = None
+        self.in_pix_fmt = in_pix_fmt
+        self.out_pix_fmt = out_pix_fmt
+    
+    def add(self, frame):
+        if self.process is None:
+            h,w = frame.shape[:2]
+            self.process = (
+                ffmpeg
+                    .input('pipe:', format='rawvideo', pix_fmt=self.in_pix_fmt, s='{}x{}'.format(w, h), framerate=self.fps)
+                    .output(self.fn, pix_fmt=self.out_pix_fmt, vcodec=self.vcodec)
+                    .overwrite_output()
+                    .run_async(pipe_stdin=True)
+            )
+        self.process.stdin.write(
             frame
                 .astype(np.uint8)
                 .tobytes()
         )
-    process.stdin.close()
-    process.wait()
+
+    def close(self):
+        if self.process is None:
+            return
+        self.process.stdin.close()
+        self.process.wait()
+
+def vidwrite(fn, images, **kwargs):
+    writer = VideoWriter(fn, **kwargs)
+    for image in images:
+        writer.add(image)
+    writer.close()

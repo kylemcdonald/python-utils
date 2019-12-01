@@ -14,6 +14,7 @@ def draw_text(canvas, text, xy, color=0, scale=1, thickness=1, highlight=None,
         canvas[t-th-baseline-1:t,l:l+tw] = highlight
     cv2.putText(canvas, text, (l,t-baseline), font_face, scale, color, thickness, cv2.LINE_AA if antialias else 0)
 
+# for some reason a fill of 0 doesn't work, but 0.1 does work
 def draw_circle(canvas, xy, r=1, stroke=None, fill=None, thickness=1, antialias=False):
     x,y = tuple(map(int, xy))
     line_type = cv2.LINE_AA if antialias else cv2.LINE_8
