@@ -37,9 +37,9 @@ def place_inside(img, xy, output_shape, fill=0):
     out.fill(fill)
     ox = 0
     oy = 0
-    if ih < oh and iy > 0:
+    if ih < oh and iy == 0:
         oy = oh - ih
-    if iw < ow and ix > 0:
+    if iw < ow and ix == 0:
         ox = ow - iw
     out[oy:oy+ih,ox:ox+iw] = img
     return out
