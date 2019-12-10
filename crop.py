@@ -33,7 +33,7 @@ def place_inside(img, xy, output_shape, fill=0):
     ix,iy = xy
     ih,iw,ic = img.shape
     oh,ow = output_shape
-    out = np.empty((oh,ow,ic), dtype=arr.dtype)
+    out = np.empty((oh,ow,ic), dtype=img.dtype)
     out.fill(fill)
     ox = 0
     oy = 0
