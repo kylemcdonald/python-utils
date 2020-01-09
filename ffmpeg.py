@@ -101,6 +101,29 @@ def auwrite(fn, audio, sr, channels=1):
     
 import ffmpeg
 
+def vidread(fn):
+    probe = ffmpeg.probe(fn)
+    for stream in probe['streams']:
+        if stream['codec_type'] == 'video':
+            width, height = stream['width'], stream['height']
+    proc = (
+        ffmpeg
+        .input(fn)
+        .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+        .run_async(pipe_stdout=True)
+    )
+    channels = 3
+    while True:
+        in_bytes = proc.stdout.read(width*height*channels)
+        if not in_bytes:
+            break
+        in_frame = (
+            np
+            .frombuffer(in_bytes, np.uint8)
+            .reshape([height, width, channels])
+        )
+        yield in_frame
+
 class VideoWriter:
     def __init__(self, fn, vcodec='libx264', fps=60, in_pix_fmt='rgb24', out_pix_fmt='yuv420p'):
         self.fn = fn
