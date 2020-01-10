@@ -123,6 +123,7 @@ def vidread(fn):
             .reshape([height, width, channels])
         )
         yield in_frame
+    proc.wait()
 
 class VideoWriter:
     def __init__(self, fn, vcodec='libx264', fps=60, in_pix_fmt='rgb24', out_pix_fmt='yuv420p'):
