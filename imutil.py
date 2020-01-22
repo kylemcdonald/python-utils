@@ -101,6 +101,10 @@ def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None, mode
         cur_min_side = min(img.shape[:2])
         big = min_side > cur_min_side
     elif output_wh is not None:
+        if output_wh[0] is None:
+            output_wh = (img.shape[1], output_wh[1])
+        elif output_wh[1] is None:
+            output_wh = (output_wh[0], img.shape[0])
         big = output_wh[0] > img.shape[1]
     elif scale is not None:
         big = scale > 1
