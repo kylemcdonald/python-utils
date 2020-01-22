@@ -25,7 +25,8 @@ def progress(itr, total=None, update_interval=1, clear=True):
             duration = cur_time - start_time
             speed = (i + 1) / duration
             duration_str = timedelta(seconds=round(duration))
-            clear_output(wait=True)
+            if clear:
+                clear_output(wait=True)
             if total:
                 duration_total = duration * total / (i + 1)
                 duration_remaining = duration_total - duration
