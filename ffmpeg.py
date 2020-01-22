@@ -101,20 +101,30 @@ def auwrite(fn, audio, sr, channels=1):
     
 import ffmpeg
 
-def vidread(fn):
+def vidread(fn, samples=None):
+    if not os.path.exists(fn):
+        raise FileNotFoundError
     probe = ffmpeg.probe(fn)
+    params = {}
     for stream in probe['streams']:
         if stream['codec_type'] == 'video':
             width, height = stream['width'], stream['height']
+            if samples is not None:
+                duration = float(stream['duration'])
+                interval = duration / samples
+                params['r'] = 1 / interval
+                params['ss'] = interval / 2
     proc = (
         ffmpeg
         .input(fn)
-        .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+        .output('pipe:', format='rawvideo', pix_fmt='rgb24', **params)
         .run_async(pipe_stdout=True)
-    )
+    )    
     channels = 3
+    frame_number = -1
     while True:
         in_bytes = proc.stdout.read(width*height*channels)
+        frame_number += 1
         if not in_bytes:
             break
         in_frame = (
