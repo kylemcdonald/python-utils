@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from utils.imutil import imshow
 
 # expects output directly from librosa.stft or librosa.cqt
-def specshow(x, spacing=256, sr=44100, max_frames=1960, skip=1, gamma=6, use_mag=True, cmap='inferno', zoom=None):
+def specshow(x, sr=44100, spacing=256, max_frames=1960, skip=1, gamma=6, use_mag=True, cmap='inferno', zoom=None, show=True):
     bins, frames = x.shape
     seconds = (frames * spacing) / sr
     minutes = int(seconds // 60)
@@ -19,6 +19,9 @@ def specshow(x, spacing=256, sr=44100, max_frames=1960, skip=1, gamma=6, use_mag
     spec **= 1 / gamma
     cm = plt.get_cmap(cmap)
     spec = cm(spec)[:,:,:3]
-    imshow(255 * np.flipud(spec), retina=zoom is None, zoom=zoom)
-    print(f'{minutes}:{seconds:04.2f} @ {sr}Hz, {frames} frames x {bins} bins @ {spacing} spacing')
-    
+    img = 255 * np.flipud(spec)
+    if show:
+        imshow(img, retina=zoom is None, zoom=zoom)
+        print(f'{minutes}:{seconds:04.2f} @ {sr}Hz, {frames} frames x {bins} bins @ {spacing} spacing')
+    else:
+        return img
