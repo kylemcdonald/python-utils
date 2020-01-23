@@ -2,6 +2,7 @@ import numpy as np
 import subprocess as sp
 import os
 import time
+import ffmpeg
 DEVNULL = open(os.devnull, 'w')
 
 # attempts to handle all float/integer conversions with and without normalizing
@@ -36,15 +37,21 @@ def convert_bit_depth(y, in_type, out_type, normalize=False):
                 y = y.astype(out_type)
     return y
 
-# load_audio can not detect the input type
-# could use a command like this with sr=None or detect=True:
-# ffprobe -hide_banner \
-#     -loglevel fatal \
-#     -show_error \
-#     -show_format \
-#     -show_streams \
-#     -print_format json \
-#     -i fn
+def aureadmeta(fn):
+    if not os.path.exists(fn):
+        raise FileNotFoundError
+    probe = ffmpeg.probe(fn)
+    for stream in probe['streams']:
+        if stream['codec_type'] == 'audio':
+            meta = {
+                'channels': stream['channels'],
+                'sample_rate': int(stream['sample_rate']),
+                'duration': float(stream['duration'])
+            }
+            return meta
+    return None
+
+# auread should be combined with aureadmeta to not force the samplerate or input type if they are None
 def auread(filename, sr=44100, mono=False, normalize=True, in_type=np.int16, out_type=np.float32):
     in_type = np.dtype(in_type).type
     out_type = np.dtype(out_type).type
@@ -99,7 +106,19 @@ def auwrite(fn, audio, sr, channels=1):
     p = sp.Popen(command, stdin=sp.PIPE, stdout=None, stderr=None)
     raw, err = p.communicate(audio.tobytes())
     
-import ffmpeg
+def vidreadmeta(fn):
+    if not os.path.exists(fn):
+        raise FileNotFoundError
+    probe = ffmpeg.probe(fn)
+    for stream in probe['streams']:
+        if stream['codec_type'] == 'video':
+            meta = {
+                'width': int(stream['width']),
+                'height': int(stream['height']),
+                'duration': float(stream['duration'])
+            }
+            return meta
+    return None
 
 def vidread(fn, samples=None):
     if not os.path.exists(fn):
