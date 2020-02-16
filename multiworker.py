@@ -29,7 +29,7 @@ class MultiWorker:
         self.input_queue.put(task)
 
     def get(self):
-        self.output_queue.get()
+        return self.output_queue.get()
 
     def join(self):
         for worker in self.workers:
