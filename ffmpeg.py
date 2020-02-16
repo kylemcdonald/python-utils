@@ -46,7 +46,7 @@ def aureadmeta(fn):
             meta = {
                 'channels': stream['channels'],
                 'sample_rate': int(stream['sample_rate']),
-                'duration': float(stream['duration'])
+                'duration': float(probe['format']['duration'])
             }
             return meta
     return None
@@ -106,6 +106,7 @@ def auwrite(fn, audio, sr, channels=1):
     p = sp.Popen(command, stdin=sp.PIPE, stdout=None, stderr=None)
     raw, err = p.communicate(audio.tobytes())
     
+import json
 def vidreadmeta(fn):
     if not os.path.exists(fn):
         raise FileNotFoundError
@@ -115,7 +116,7 @@ def vidreadmeta(fn):
             meta = {
                 'width': int(stream['width']),
                 'height': int(stream['height']),
-                'duration': float(stream['duration'])
+                'duration': float(probe['format']['duration'])
             }
             return meta
     return None
