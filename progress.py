@@ -51,7 +51,7 @@ class job_wrapper(object):
         i, task = args
         return i, self.job(task)
     
-def progress_parallel(job, tasks, total=None, update_interval=1, processes=None):
+def progress_parallel(job, tasks, total=None, processes=None, **kwargs):
     if processes == 1:
         return [job(task) for task in progress(tasks)]
     
@@ -63,7 +63,7 @@ def progress_parallel(job, tasks, total=None, update_interval=1, processes=None)
     try:
         with Pool(processes) as pool:
             results = list(progress(pool.imap_unordered(job_wrapper(job), enumerate(tasks)),
-                                    total=total, update_interval=update_interval))
+                                    total=total, **kwargs))
             results.sort()
             return [x for i,x in results]
     except KeyboardInterrupt:
