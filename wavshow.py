@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def wavshow(audio, sr=None, resolution=2048):
+def wavshow(audio, sr=None, resolution=2048, plot=True):
     duration = len(audio)
     if sr is not None:
          duration /= sr
@@ -21,4 +21,5 @@ def wavshow(audio, sr=None, resolution=2048):
         plt.plot(x_ticks, audio, color='black', lw=1)
     plt.xlim(0, duration)
     plt.xlabel('Seconds' if sr is not None else 'Samples')
-    plt.show()
+    if plot:
+        plt.show()
