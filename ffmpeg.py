@@ -121,25 +121,31 @@ def vidreadmeta(fn):
             return meta
     return None
 
-def vidread(fn, samples=None):
+def vidread(fn, samples=None, rate=None, hwaccel=None):
     if not os.path.exists(fn):
         raise FileNotFoundError
     probe = ffmpeg.probe(fn)
-    params = {}
+    out_params = {}
     for stream in probe['streams']:
         if stream['codec_type'] == 'video':
             width, height = stream['width'], stream['height']
             if samples is not None:
                 duration = float(stream['duration'])
                 interval = duration / samples
-                params['r'] = 1 / interval
-                params['ss'] = interval / 2
+                out_params['r'] = 1 / interval
+                out_params['ss'] = interval / 2
+            elif rate is not None:
+                out_params['r'] = rate
+                out_params['ss'] = 1 / (2 * rate)
+    in_params = {}
+    if hwaccel is not None:
+        in_params['hwaccel'] = hwaccel
     proc = (
         ffmpeg
-        .input(fn)
-        .output('pipe:', format='rawvideo', pix_fmt='rgb24', **params)
+        .input(fn, **in_params)
+        .output('pipe:', format='rawvideo', pix_fmt='rgb24', **out_params)
         .run_async(pipe_stdout=True)
-    )    
+    )
     channels = 3
     frame_number = -1
     while True:
