@@ -2,8 +2,10 @@ import os
 import fnmatch
 
 # does not operate recursively
-def list_directories(directory):
+def list_directories(directory, exclude_prefixes=('.',)):
     for f in os.listdir(directory):
+        if f.startswith(exclude_prefixes):
+            continue
         joined = os.path.join(directory, f)
         if os.path.isdir(joined):
             yield joined
