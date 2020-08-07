@@ -1,8 +1,13 @@
 from multiprocessing import Pool, cpu_count
-from IPython.display import clear_output
 import time
 from datetime import datetime, timedelta
 import sys
+
+try:
+    from IPython.display import clear_output
+except ModuleNotFoundError:
+    def clear_output(*args, **kwargs):
+        pass
 
 def progress(itr, total=None, update_interval=1, clear=True):
     if total is None and hasattr(itr, '__len__'):
@@ -10,7 +15,7 @@ def progress(itr, total=None, update_interval=1, clear=True):
         if total == 0:
             return
     if total:
-        print('0/{} 0s 0/s'.format(total))
+        print(f'0/{total} 0s 0/s')
     else:
         print('0 0s 0/s')
     start_time = None
@@ -32,9 +37,9 @@ def progress(itr, total=None, update_interval=1, clear=True):
                 duration_remaining = duration_total - duration
                 duration_remaining_str = timedelta(seconds=round(duration_remaining))
                 pct = 100. * (i + 1) / total
-                print('{:.2f}% {}/{} {}<{} {:.2f}/s'.format(pct, i+1, total, duration_str, duration_remaining_str, speed))
+                print(f'{pct:.2f}% {i+1}/{total} {duration_str}<{duration_remaining_str} {speed:.2f}/s')
             else:
-                print('{} {} {:.2f}/s'.format(i+1, duration_str, speed))
+                print(f'{i+1} {duration_str} {speed:.2f}/s')
             last_time = cur_time
     
     duration = time.time() - start_time
@@ -42,7 +47,7 @@ def progress(itr, total=None, update_interval=1, clear=True):
     duration_str = timedelta(seconds=round(duration))
     if clear:
         clear_output(wait=True)
-    print('{} {} {:.2f}/s'.format(i+1, duration_str, speed))
+    print(f'{i+1} {duration_str} {speed:.2f}/s')
         
 class job_wrapper(object):
     def __init__(self, job):
