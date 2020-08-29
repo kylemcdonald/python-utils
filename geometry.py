@@ -13,25 +13,33 @@ def vector_vector_angle(v1, v2):
     return angle
 
 # pair of points on lines p1,p2 and p3,p4 closest to each other
-def line_line_closest(p1,p2,p3,p4):
+def line_line_closest(p1,p2,p3,p4,check=False):
+    p1 = np.asarray(p1)
+    p2 = np.asarray(p2)
+    p3 = np.asarray(p3)
+    p4 = np.asarray(p4)
+
     p13 = p1 - p3
     p43 = p4 - p3
     p21 = p2 - p1
 
-    d1343 = p13[0] * p43[0] + p13[1] * p43[1] + p13[2] * p43[2]
-    d4321 = p43[0] * p21[0] + p43[1] * p21[1] + p43[2] * p21[2]
-    d1321 = p13[0] * p21[0] + p13[1] * p21[1] + p13[2] * p21[2]
-    d4343 = p43[0] * p43[0] + p43[1] * p43[1] + p43[2] * p43[2]
-    d2121 = p21[0] * p21[0] + p21[1] * p21[1] + p21[2] * p21[2]
+    d1343 = np.dot(p13, p43)
+    d4321 = np.dot(p43, p21)
+    d1321 = np.dot(p13, p21)
+    d4343 = np.dot(p43, p43)
+    d2121 = np.dot(p21, p21)
 
     denom = d2121 * d4343 - d4321 * d4321
-    # currently not checking for parallel lines
-#     if abs(denom) < 0.000001:
-#         return None, None
+    if check and abs(denom) == 0:
+        return None
     numer = d1343 * d4321 - d1321 * d4343
 
     mua = numer / denom
     mub = (d1343 + d4321 * (mua)) / d4343
+
+    if check:
+        if mua < 0 or mua > 1 or mub < 0 or mub > 1:
+            return None
 
     pa = p1 + mua * p21
     pb = p3 + mub * p43
