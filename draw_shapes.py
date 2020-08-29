@@ -36,7 +36,7 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None, thickness=1, antialias=
 #             if ls < r2:
 #                 canvas[i,j] = fill     
 
-def draw_rectangle(canvas, tblr, fill=None, stroke=None):
+def draw_rectangle_thin(canvas, tblr, fill=None, stroke=None):
     t,b,l,r = tblr
     t = int(max(t,0))
     b = int(min(b,canvas.shape[0]-1))
@@ -63,7 +63,14 @@ def draw_rectangle(canvas, tblr, fill=None, stroke=None):
             canvas[b,l:r+1] = stroke
         except IndexError:
             pass
-
+        
+def draw_rectangle(canvas, tblr, fill=None, stroke=None, thickness=1):
+    draw_rectangle_thin(canvas, tblr, fill, stroke)
+    for i in range(1, thickness):
+        t,b,l,r = tblr
+        draw_rectangle_thin(canvas, (t-i,b+i,l-i,r+i), fill, stroke)
+        draw_rectangle_thin(canvas, (t+i,b-i,l+i,r-i), fill, stroke)
+        
 def draw_rectangle_dlib(canvas, det, fill=None, stroke=None):
     rect = (det.top(), det.bottom(), det.left(), det.right())
     draw_rectangle(canvas, rect, fill=fill, stroke=stroke)
