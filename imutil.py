@@ -16,6 +16,10 @@ def imshow(img, fmt='png', retina=False, zoom=None):
     if img is None:
         raise TypeError('input image not provided')
     
+    if isinstance(img, str):
+        IPython.display.display(IPython.display.Image(filename=img, retina=retina))
+        return
+    
     if len(img.shape) == 1:
         n = len(img)
         side = int(np.sqrt(n))
@@ -89,7 +93,8 @@ def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None, mode
         cur_min_side = min(img.shape[:2])
         scale = min_side / cur_min_side
     if output_wh is None:
-        output_wh = (int(img.shape[1]*scale), int(img.shape[0]*scale))
+        output_wh = (int(np.round(img.shape[1]*scale)),
+                     int(np.round(img.shape[0]*scale)))
     return cv2.resize(img, output_wh, interpolation=cv2.INTER_CUBIC if mode is None else mode)
 
 def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None, mode=None):
