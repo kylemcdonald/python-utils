@@ -55,9 +55,9 @@ def imread(filename, mode=None, ext=None):
         if len(img.shape) > 2:
             img = rb_swap(img)
     if img is not None:
-        if mode is 'rgb':
+        if mode == 'rgb':
             img = to_single_rgb(img)
-        elif mode is 'gray':
+        elif mode == 'gray':
             img = to_single_gray(img)
     return img
 
