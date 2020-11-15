@@ -25,3 +25,6 @@ def list_files(directory, extensions=None, exclude_prefixes=('.',)):
             joined = os.path.join(root, filename)
             if extensions is None or ext.lower() in extensions:
                 yield joined
+                
+def get_stem(fn):
+    return os.path.splitext(os.path.basename(fn))[0]
