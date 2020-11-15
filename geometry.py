@@ -69,21 +69,25 @@ def ray_point_closest(p1, p2, p3):
 # from 0/0 to width/height
 # to -1,+1 to +1/-1 (y axis is flipped)
 # note that depth is not in world units, but normalized by z_near/z_far
+# designed for multiple points
 def screen_to_world(screen, depth, viewport, extrinsics, camera_matrix):
     principal_point = camera_matrix[:2,2]
     screen -= principal_point - (viewport - 1) / 2
-    camera = [
-        2 * screen[0] / viewport[0] - 1,
-        1 - 2 * screen[1] / viewport[1],
-        depth
-    ]
+    n = len(screen)
+    camera = np.array([
+        2 * screen[:,0] / viewport[0] - 1,
+        1 - 2 * screen[:,1] / viewport[1],
+        [depth] * n
+    ])
+    camera = camera.T
     return camera_to_world(camera, extrinsics, viewport, camera_matrix)
 
-def to_homogenous(xyz):
-    return np.asarray([xyz[0], xyz[1], xyz[2], 1])
+def to_homogenous(points):
+    ones = np.ones((len(points), 1), points.dtype)
+    return np.hstack((points, ones))
 
 def from_homogenous(xyzw):
-    return xyzw[:3] / xyzw[3]
+    return xyzw[:,:3] / xyzw[:,3].reshape(-1,1)
 
 def camera_to_world(camera, extrinsics, viewport, camera_matrix):
     mvp_matrix = get_model_view_projection_matrix(extrinsics, viewport, camera_matrix)
