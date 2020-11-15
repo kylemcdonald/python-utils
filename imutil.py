@@ -17,7 +17,10 @@ def imshow(img, fmt='png', retina=False, zoom=None):
         raise TypeError('input image not provided')
     
     if isinstance(img, str):
-        IPython.display.display(IPython.display.Image(filename=img, retina=retina))
+        if img.startswith('http:') or img.startswith('https:'):
+            IPython.display.display(IPython.display.Image(url=img, retina=retina))
+        else:
+            IPython.display.display(IPython.display.Image(filename=img, retina=retina))
         return
     
     if len(img.shape) == 1:
@@ -62,10 +65,19 @@ def imread(filename, mode=None, ext=None):
     return img
 
 def imwrite(filename, img):
-    if img is not None:
-        if len(img.shape) > 2:
-            img = img[...,::-1]
-    return cv2.imwrite(filename, img)
+    if img is None:
+        return
+    if len(img.shape) == 2:
+        return cv2.imwrite(filename, img)
+    if len(img.shape) == 3:
+        if img.shape[-1] == 3:
+            return cv2.imwrite(filename, img[...,::-1])
+        if img.shape[-1] == 4:
+            return cv2.imwrite(filename, img[...,(2,1,0,3)])
+        else:
+            raise Exception('Unsupported number of channels')
+    else:
+        raise Exception('Unsupported image shape')
 
 def downsample(img, scale=None, output_wh=None, max_side=None, min_side=None, block_size=None, mode=None):
     if max_side is not None:
@@ -97,6 +109,8 @@ def upsample(img, scale=None, output_wh=None, max_side=None, min_side=None, mode
                      int(np.round(img.shape[0]*scale)))
     return cv2.resize(img, output_wh, interpolation=cv2.INTER_CUBIC if mode is None else mode)
 
+# output_wh value None in one dimension means "scale proportionally to other dimension"
+# output_wh value -1 in one dimension means "use the existing value"
 def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None, mode=None):
     big = True
     if max_side is not None:
@@ -107,11 +121,18 @@ def imresize(img, scale=None, output_wh=None, max_side=None, min_side=None, mode
         big = min_side > cur_min_side
     elif output_wh is not None:
         if output_wh[0] is None:
-            output_wh = (img.shape[1], output_wh[1])
+            scale = output_wh[1] / img.shape[0]
+            output_wh = None
         elif output_wh[1] is None:
-            output_wh = (output_wh[0], img.shape[0])
-        big = output_wh[0] > img.shape[1]
-    elif scale is not None:
+            scale = output_wh[0] / img.shape[1]
+            output_wh = None
+        elif output_wh[0] == -1:
+            output_wh[0] = img.shape[1]
+        elif output_wh[1] == -1:
+            output_wh[1] = img.shape[0]
+        if output_wh is not None:
+            big = output_wh[0] > img.shape[1]
+    if scale is not None:
         big = scale > 1
     
     if big:
