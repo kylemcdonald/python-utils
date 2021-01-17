@@ -130,7 +130,7 @@ def vidread(fn, samples=None, rate=None, hwaccel=None):
         if stream['codec_type'] == 'video':
             width, height = stream['width'], stream['height']
             try:
-                if stream['tags']['rotate'] in ['90','-90']:
+                if stream['tags']['rotate'] in ['90','270','-90']: # not sure if -90 ever happens
                     width, height = height, width
             except KeyError:
                 pass
