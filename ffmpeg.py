@@ -129,6 +129,11 @@ def vidread(fn, samples=None, rate=None, hwaccel=None):
     for stream in probe['streams']:
         if stream['codec_type'] == 'video':
             width, height = stream['width'], stream['height']
+            try:
+                if stream['tags']['rotate'] in ['90','-90']:
+                    width, height = height, width
+            except KeyError:
+                pass
             if samples is not None:
                 duration = float(stream['duration'])
                 interval = duration / samples
