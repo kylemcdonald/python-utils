@@ -106,6 +106,16 @@ def auwrite(fn, audio, sr, channels=1):
     p = sp.Popen(command, stdin=sp.PIPE, stdout=None, stderr=None)
     raw, err = p.communicate(audio.tobytes())
     
+def auchannels(y):
+    if len(y.shape) > 1:
+        return y.shape[0]
+    return 1
+
+def aulen(y):
+    if len(y.shape) > 1:
+        return y.shape[1]
+    return len(y)
+    
 import json
 def vidreadmeta(fn):
     if not os.path.exists(fn):
@@ -145,26 +155,29 @@ def vidread(fn, samples=None, rate=None, hwaccel=None):
     in_params = {}
     if hwaccel is not None:
         in_params['hwaccel'] = hwaccel
-    proc = (
-        ffmpeg
-        .input(fn, **in_params)
-        .output('pipe:', format='rawvideo', pix_fmt='rgb24', **out_params)
-        .run_async(pipe_stdout=True)
-    )
     channels = 3
     frame_number = -1
-    while True:
-        in_bytes = proc.stdout.read(width*height*channels)
-        frame_number += 1
-        if not in_bytes:
-            break
-        in_frame = (
-            np
-            .frombuffer(in_bytes, np.uint8)
-            .reshape([height, width, channels])
+    try:
+        proc = (
+            ffmpeg
+            .input(fn, **in_params)
+            .output('pipe:', format='rawvideo', pix_fmt='rgb24', **out_params)
+            .run_async(pipe_stdout=True)
         )
-        yield in_frame
-    proc.wait()
+        while True:
+            in_bytes = proc.stdout.read(width*height*channels)
+            frame_number += 1
+            if not in_bytes:
+                break
+            in_frame = (
+                np
+                .frombuffer(in_bytes, np.uint8)
+                .reshape([height, width, channels])
+            )
+            yield in_frame
+    finally:
+        proc.stdout.close()
+        proc.wait()
 
 class VideoWriter:
     def __init__(self, fn, vcodec='libx264', fps=60, in_pix_fmt='rgb24', out_pix_fmt='yuv420p', input_args=None, output_args=None):
