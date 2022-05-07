@@ -7,5 +7,5 @@ For Python 3.7+
 Install using pip:
 
 ```
-pip install git+git://github.com/kylemcdonald/python-utils.git
+pip install git+https://github.com/kylemcdonald/python-utils.git
 ```
