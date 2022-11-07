@@ -24,7 +24,11 @@ class Ticker():
             cur_print = int(duration)
             if cur_print != self.last_print:
                 fps = self.total_ticks / duration
-                recent_fps = (len(self.recent) - 1) / (self.recent[-1] - self.recent[0])
+                denominator = (self.recent[-1] - self.recent[0])
+                if denominator > 0:
+                    recent_fps = (len(self.recent) - 1) / denominator
+                else:
+                    recent_fps = 0
                 jitter = np.std(self.recent)
                 print(f'recent: {recent_fps:0.2f} fps, all: {fps:0.2f} fps, jitter:', format_time(jitter))
                 self.last_print = cur_print
