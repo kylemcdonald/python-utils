@@ -7,7 +7,7 @@ def draw_line(canvas, pt1, pt2, r=1, stroke=None):
 
 def draw_text(canvas, text, xy, color=0, scale=1, thickness=1, highlight=None,
         font_face=cv2.FONT_HERSHEY_SIMPLEX, antialias=False):
-    l,t = xy
+    l,t = tuple(map(int, xy))
     (tw,th), baseline = cv2.getTextSize(text, font_face, scale, thickness)
     t += th + baseline - 1
     if highlight is not None:
@@ -38,15 +38,17 @@ def draw_circle(canvas, xy, r=1, stroke=None, fill=None, thickness=1, antialias=
 
 def draw_rectangle_thin(canvas, tblr, fill=None, stroke=None):
     t,b,l,r = tblr
-    t = int(max(t,0))
-    b = int(min(b,canvas.shape[0]-1))
-    l = int(max(l,0))
-    r = int(min(r,canvas.shape[1]-1))
+    ye = canvas.shape[0] - 1
+    xe = canvas.shape[1] - 1
+    t = int(min(max(t,0),ye))
+    b = int(min(max(b,0),ye))
+    l = int(min(max(l,0),xe))
+    r = int(min(max(r,0),xe))
     if fill is not None:
         canvas[t:b,l:r] = fill
     if stroke is not None:
-        b -= 1
-        r -= 1
+        b = int(max(b-1,0))
+        r = int(max(r-1,0))
         try:
             canvas[t:b,l] = stroke
         except IndexError:
@@ -60,7 +62,8 @@ def draw_rectangle_thin(canvas, tblr, fill=None, stroke=None):
         except IndexError:
             pass
         try:
-            canvas[b,l:r+1] = stroke
+            r = int(min(r+1,xe))
+            canvas[b,l:r] = stroke
         except IndexError:
             pass
         
