@@ -8,13 +8,16 @@ from multiprocessing import Queue
 from multiprocessing import Process
 from threading import get_ident
 import os
+import sys
 
 class Ticker():
-    def __init__(self):
+    def __init__(self, update_rate=1):
         self.total_ticks = 0
         self.start_time = None
         self.last_print = None
         self.recent = []
+        self.clear_output = 'ipykernel' in sys.modules
+        self.update_rate = update_rate
 
     def tick(self):
         cur_time = time()
@@ -22,7 +25,7 @@ class Ticker():
         if self.start_time is not None:
             duration = cur_time - self.start_time
             cur_print = int(duration)
-            if cur_print != self.last_print:
+            if cur_print != self.last_print and cur_print % self.update_rate == 0:
                 fps = self.total_ticks / duration
                 denominator = (self.recent[-1] - self.recent[0])
                 if denominator > 0:
@@ -33,7 +36,8 @@ class Ticker():
                 print(f'recent: {recent_fps:0.2f} fps, all: {fps:0.2f} fps, jitter:', format_time(jitter))
                 self.last_print = cur_print
                 self.recent = []
-                clear_output(wait=True)
+                if self.clear_output:
+                    clear_output(wait=True)
         else:
             self.start_time = cur_time
         self.total_ticks += 1
