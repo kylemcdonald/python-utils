@@ -86,7 +86,9 @@ def auread(filename, sr=44100, mono=False, normalize=True, in_type=np.int16, out
 
     return audio, sr
 
-def auwrite(fn, audio, sr, channels=1):
+def auwrite(fn, audio, sr):
+    if len(audio.shape) > 1:
+        channels = np.min(audio.shape)
     format_strings = {
         'float64': 'f64le',
         'float32': 'f32le',
@@ -99,12 +101,16 @@ def auwrite(fn, audio, sr, channels=1):
     command = [
         'ffmpeg',
         '-y',
+        '-ac', channels,
         '-ar', str(sr),
         '-f', format_string,
         '-i', 'pipe:',
         fn]
     p = sp.Popen(command, stdin=sp.PIPE, stdout=None, stderr=None)
-    raw, err = p.communicate(audio.tobytes())
+    if channels > 1 and audio.shape[0] == channels:
+        raw, err = p.communicate(audio.T.tobytes())
+    else:
+        raw, err = p.communicate(audio.tobytes())
     
 def auchannels(y):
     if len(y.shape) > 1:
