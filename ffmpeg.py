@@ -89,6 +89,8 @@ def auread(filename, sr=44100, mono=False, normalize=True, in_type=np.int16, out
 def auwrite(fn, audio, sr):
     if len(audio.shape) > 1:
         channels = np.min(audio.shape)
+    else:
+        channels = 1
     format_strings = {
         'float64': 'f64le',
         'float32': 'f32le',
@@ -101,7 +103,7 @@ def auwrite(fn, audio, sr):
     command = [
         'ffmpeg',
         '-y',
-        '-ac', channels,
+        '-ac', str(channels),
         '-ar', str(sr),
         '-f', format_string,
         '-i', 'pipe:',
@@ -122,6 +124,12 @@ def aulen(y):
         return y.shape[1]
     return len(y)
     
+def convert_fraction_to_real(framerate):
+    if '/' in framerate:
+        num,div = framerate.split('/')
+        return float(num) / float(div)
+    return float(framerate)
+
 import json
 def vidreadmeta(fn):
     if not os.path.exists(fn):
@@ -132,7 +140,8 @@ def vidreadmeta(fn):
             meta = {
                 'width': int(stream['width']),
                 'height': int(stream['height']),
-                'duration': float(probe['format']['duration'])
+                'duration': float(probe['format']['duration']),
+                'framerate': convert_fraction_to_real(stream['avg_frame_rate'])
             }
             return meta
     return None

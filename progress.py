@@ -73,3 +73,16 @@ def progress_parallel(job, tasks, total=None, processes=None, **kwargs):
             return [x for i,x in results]
     except KeyboardInterrupt:
         pass
+
+from joblib import Parallel, delayed
+def progress_parallel_joblib(job, tasks, total=None, processes=None, backend=None):
+    if total is None and hasattr(tasks, '__len__'):
+        total = len(tasks)
+    if processes is None:
+        processes = -1
+
+    try:
+        results = Parallel(n_jobs=processes)(delayed(job)(task) for task in progress(tasks))
+        return results
+    except KeyboardInterrupt:
+        pass
