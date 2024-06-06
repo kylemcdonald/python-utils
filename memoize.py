@@ -5,9 +5,8 @@ import inspect
 def memoize(func):
     is_method = 'self' in inspect.getfullargspec(func).args
     def wrapper(*args, **kwargs):
-        if is_method:
-            args = args[1:] # ignore self
-        h = hashlib.md5(str(args).encode()).hexdigest()
+        args_to_hash = args[1:] if is_method else args
+        h = hashlib.md5(str(args_to_hash).encode()).hexdigest()
         fn = f"cache/{func.__name__}_{h}.pkl"
         try:
             with open(fn, 'rb') as f:
