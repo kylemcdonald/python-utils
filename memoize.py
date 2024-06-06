@@ -1,8 +1,12 @@
 import hashlib
 import pickle
+import inspect
 
 def memoize(func):
+    is_method = 'self' in inspect.getfullargspec(func).args
     def wrapper(*args, **kwargs):
+        if is_method:
+            args = args[1:] # ignore self
         h = hashlib.md5(str(args).encode()).hexdigest()
         fn = f"cache/{func.__name__}_{h}.pkl"
         try:
