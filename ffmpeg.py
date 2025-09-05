@@ -2,7 +2,7 @@ import numpy as np
 import subprocess as sp
 import os
 import time
-import ffmpeg
+import ffmpeg as ff
 DEVNULL = open(os.devnull, 'w')
 
 # attempts to handle all float/integer conversions with and without normalizing
@@ -134,7 +134,7 @@ import json
 def vidreadmeta(fn):
     if not os.path.exists(fn):
         raise FileNotFoundError
-    probe = ffmpeg.probe(fn)
+    probe = ff.probe(fn)
     for stream in probe['streams']:
         if stream['codec_type'] == 'video':
             meta = {
@@ -146,16 +146,16 @@ def vidreadmeta(fn):
             return meta
     return None
 
-def vidread(fn, samples=None, rate=None, hwaccel=None):
+def vidread(fn, samples=None, rate=None, hwaccel=None, rotate_90=False):
     if not os.path.exists(fn):
         raise FileNotFoundError
-    probe = ffmpeg.probe(fn)
+    probe = ff.probe(fn)
     out_params = {}
     for stream in probe['streams']:
         if stream['codec_type'] == 'video':
             width, height = stream['width'], stream['height']
             try:
-                if stream['tags']['rotate'] in ['90','270','-90']: # not sure if -90 ever happens
+                if rotate_90 or stream['tags']['rotate'] in ['90','270','-90']: # not sure if -90 ever happens
                     width, height = height, width
             except KeyError:
                 pass
@@ -174,7 +174,7 @@ def vidread(fn, samples=None, rate=None, hwaccel=None):
     frame_number = -1
     try:
         proc = (
-            ffmpeg
+            ff
             .input(fn, **in_params)
             .output('pipe:', format='rawvideo', pix_fmt='rgb24', **out_params)
             .run_async(pipe_stdout=True)
@@ -209,7 +209,7 @@ class VideoWriter:
         if self.process is None:
             h,w = frame.shape[:2]
             self.process = (
-                ffmpeg
+                ff
                     .input('pipe:', format='rawvideo', s='{}x{}'.format(w, h), **self.input_args)
                     .output(self.fn, **self.output_args)
                     .overwrite_output()

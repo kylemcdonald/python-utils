@@ -4,11 +4,17 @@ import inspect
 import os
 
 def memoize(func):
-    is_method = 'self' in inspect.getfullargspec(func).args    
+    is_method = 'self' in inspect.getfullargspec(func).args
     def wrapper(*args, **kwargs):
-        args_to_hash = args[1:] if is_method else args
-        h = hashlib.md5(str(args_to_hash).encode()).hexdigest()        
-        fn = f"cache/{func.__name__}_{h}.pkl"
+        fn = os.path.join("cache", func.__name__)
+        args_to_hash = ""
+        if len(args) > 0:
+            args_to_hash += str(args[1:] if is_method else args)
+        if len(kwargs) > 0:
+            args_to_hash += str(kwargs)
+        if len(args_to_hash) > 0:
+            fn += "_" + hashlib.md5(str(args_to_hash).encode()).hexdigest()
+        fn += ".pkl"
         try:
             os.makedirs('cache', exist_ok=True)
             with open(fn, 'rb') as f:
